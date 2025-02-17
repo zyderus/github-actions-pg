@@ -26,7 +26,7 @@ jobs:
         run: npm install
 
       - name: Run Linter
-        run: npm lint
+        run: npm run lint
 
   test:
     name: Run Tests
@@ -44,11 +44,11 @@ jobs:
         run: npm install
 
       - name: Run Tests
-        run: npm test # Adjust this if using another test command
+        run: npm run test
 
   deploy:
     name: Deploy Application
-    needs: test
+    needs: [test, lint]
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
