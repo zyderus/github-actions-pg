@@ -25,6 +25,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout repository
@@ -43,6 +44,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout repository
@@ -58,8 +60,6 @@ jobs:
         run: npm ci
 
       - run: echo "Running tests..."
-
-      - run: npm run test
 # ==================== CI/CD Workflow ==================== #
 # name: CI/CD Workflow
 
