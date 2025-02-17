@@ -1,0 +1,61 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - '**' # Runs tests on push to any branch
+
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Linter
+        run: npm lint
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test # Adjust this if using another test command
+
+  deploy:
+    name: Deploy Application
+    needs: test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Staging
+        run: |
+          echo "Deploying application from DEV to STAGING..."
+          # Add your actual deployment commands here
