@@ -1,89 +1,131 @@
-name: CI/CD Workflow
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - '**' # Runs tests on push to any branch
+    branches: '**'
   pull_request:
-    branches:
-      - dev
+    branches: '**'
 
 jobs:
-  install:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        id: cache-npm
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
 
       - name: Install dependencies
-        # if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: |
-          npm ci
-          npm list
+        run: npm ci
+# ==================== CI/CD Workflow ==================== #
+# name: CI/CD Workflow
 
-      - name: Save node_modules as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: node_modules
-          path: node_modules
+# on:
+#   push:
+#     branches:
+#       - '**' # Runs tests on push to any branch
+#   pull_request:
+#     branches:
+#       - dev
 
-  lint:
-    name: Lint Code
-    runs-on: ubuntu-latest
-    needs: install
-    steps:
-      - uses: actions/checkout@v4
+# jobs:
+#   install:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
+#           cache: 'npm'
 
-      - name: Restore node_modules
-        uses: actions/download-artifact@v4
-        with:
-          name: node_modules
+#       - name: Install dependencies
+#         # if: steps.cache-node-modules.outputs.cache-hit != 'true'
+#         run: |
+#           npm ci
+#           npm list
 
-      - run: npm install
+#       - name: Save node_modules as artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: node_modules
+#           path: node_modules
 
-      - name: Run Linter
-        run: npm run lint
+#   lint:
+#     name: Lint Code
+#     runs-on: ubuntu-latest
+#     needs: install
+#     steps:
+#       - uses: actions/checkout@v4
 
-  # test:
-  #   name: Run Tests
-  #   runs-on: ubuntu-latest
-  #   needs: install
-  #   steps:
-  #     - uses: actions/checkout@v4
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22
+#       - name: Restore node_modules
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: node_modules
 
-  #     - name: Restore node_modules
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: node_modules
+#       - run: npm install
 
-  #     - name: Run Test
-  #       run: npm run test
+#       - name: Run Linter
+#         run: npm run lint
 
-  deploy:
-    name: Deploy Application
-    # needs: [lint, test]
-    needs: [lint]
-    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+#   # test:
+#   #   name: Run Tests
+#   #   runs-on: ubuntu-latest
+#   #   needs: install
+#   #   steps:
+#   #     - uses: actions/checkout@v4
 
-      - name: Deploy to Staging
-        run: |
-          echo "Deploying application from DEV to STAGING..."
+#   #     - name: Setup Node.js
+#   #       uses: actions/setup-node@v4
+#   #       with:
+#   #         node-version: 22
+
+#   #     - name: Restore node_modules
+#   #       uses: actions/download-artifact@v4
+#   #       with:
+#   #         name: node_modules
+
+#   #     - name: Run Test
+#   #       run: npm run test
+
+#   deploy:
+#     name: Deploy Application
+#     # needs: [lint, test]
+#     needs: [lint]
+#     if: github.event_name == 'pull_request' && github.base_ref == 'dev'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Deploy to Staging
+#         run: |
+#           echo "Deploying application from DEV to STAGING..."
