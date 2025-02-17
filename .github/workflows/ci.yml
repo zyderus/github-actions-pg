@@ -39,6 +39,9 @@ jobs:
       - name: Check node_modules content
         run: ls -lah node_modules
 
+      - name: Check if Next.js is installed
+        run: ls -lah node_modules/.bin/next
+
       - name: Save node_modules as artifact
         uses: actions/upload-artifact@v4
         with:
