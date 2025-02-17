@@ -57,6 +57,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - run: echo "Running tests..."
+
       - run: npm run test
 # ==================== CI/CD Workflow ==================== #
 # name: CI/CD Workflow
