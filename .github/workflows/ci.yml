@@ -35,6 +35,10 @@ jobs:
           npm install
           npm list
 
+      # ✅ Check that node_modules exists before uploading
+      - name: Check node_modules content
+        run: ls -lah node_modules
+
       - name: Save node_modules as artifact
         uses: actions/upload-artifact@v4
         with:
