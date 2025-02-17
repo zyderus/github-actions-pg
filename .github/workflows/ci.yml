@@ -31,13 +31,13 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
-        run: |
-          npm install
-          npm list
+        run: npm ci
 
       # ✅ Check that node_modules exists before uploading
       - name: Check node_modules content
-        run: ls -lah node_modules
+        run: |
+          ls -lah node_modules
+          npm list
 
       - name: Check if Next.js is installed
         run: ls -lah node_modules/.bin/next
